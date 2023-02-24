@@ -1,10 +1,14 @@
 package com.diplomaproject.tendersystembackend.controller;
 
+import com.diplomaproject.tendersystembackend.constants.SecurityConstant;
 import com.diplomaproject.tendersystembackend.model.Users;
 import com.diplomaproject.tendersystembackend.payload.LoginDTO;
 import com.diplomaproject.tendersystembackend.payload.RegisterDTO;
+import com.diplomaproject.tendersystembackend.payload.UserPrincipal;
 import com.diplomaproject.tendersystembackend.service.UserService;
+import com.diplomaproject.tendersystembackend.utils.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,9 +21,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@CrossOrigin("*")
 public class UserController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping()
     public ResponseEntity<?> getAllUsers(){
@@ -28,7 +34,11 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO){
-        Users new_user = userService.register(registerDTO.getUsername(), registerDTO.getSurname(), registerDTO.getEmail(), registerDTO.getPassword());
+        Users new_user = userService.register(
+                registerDTO.getUsername(),
+                registerDTO.getSurname(),
+                registerDTO.getEmail(),
+                registerDTO.getPassword());
 
         return new ResponseEntity<>(new_user, HttpStatus.CREATED);
     }
@@ -38,18 +48,19 @@ public class UserController {
         authenticate(loginDTO.getEmail(), loginDTO.getPassword());
 
         Users userByEmail = userService.findUserByEmail(loginDTO.getEmail());
+        UserPrincipal userPrincipal = new UserPrincipal(userByEmail);
+        HttpHeaders httpHeaders = getJwtHeader(userPrincipal);
+        return new ResponseEntity<>(userByEmail.getEmail() + " you are successfully signed!", httpHeaders, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(userByEmail.getEmail() + " you are successfully signed!", HttpStatus.OK);
+    private HttpHeaders getJwtHeader(UserPrincipal userPrincipal) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add(SecurityConstant.JWT_TOKEN_HEADER, jwtTokenProvider.generateJwtToken(userPrincipal));
+
+        return httpHeaders;
     }
 
     private void authenticate(String email, String password) {
-        Authentication authenticate;
-        try{
-            authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-        } catch (Exception e){
-            throw new BadCredentialsException("Invalid credentials!");
-        }
-
-        SecurityContextHolder.getContext().setAuthentication(authenticate);
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
     }
 }
