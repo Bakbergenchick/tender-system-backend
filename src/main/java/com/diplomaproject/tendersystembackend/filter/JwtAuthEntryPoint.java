@@ -17,7 +17,6 @@ import java.io.IOException;
 @Component
 public class JwtAuthEntryPoint extends Http403ForbiddenEntryPoint {
 
-
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException arg2) throws IOException {
         HttpResponse httpResponse =

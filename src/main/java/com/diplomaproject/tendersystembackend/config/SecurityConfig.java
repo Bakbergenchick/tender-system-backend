@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/user/register", "/user/login").permitAll()
+                .antMatchers("/user/register/**", "/user/login", "/tender/**").permitAll()
                 .anyRequest().authenticated().and()
                 .exceptionHandling()
                 .accessDeniedHandler(jwtAccessDeniedHandler)

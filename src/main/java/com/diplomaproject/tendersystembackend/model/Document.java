@@ -1,28 +1,32 @@
 package com.diplomaproject.tendersystembackend.model;
 
-import com.diplomaproject.tendersystembackend.model.enums.ERole;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.util.Set;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class Role implements Serializable {
+public class Document {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String name;
+    private String type;
+    @Lob
+    @Column(name = "document_data",length = 100000)
+    private byte[] documentData;
 
-    @Enumerated(EnumType.STRING)
-    private ERole roleType;
+    @ManyToOne
+    @JoinColumn(name = "tender_id")
+    private Tender tenderId;
+
+
 }
