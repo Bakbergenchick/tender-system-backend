@@ -25,12 +25,10 @@ public class Statement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "tender_id")
     private Tender tenderId;
 
-//    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users userId;

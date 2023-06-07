@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface TenderRepository extends JpaRepository<Tender, Long> {
     Optional<Tender> findTenderByTenderName(String tenderName);
-
+    Optional<Tender> findTenderById(Long id);
 }

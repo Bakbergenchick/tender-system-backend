@@ -41,6 +41,17 @@ public class TenderController {
         return new ResponseEntity<>(statementService.getAllStatements(), HttpStatus.OK);
     }
 
+    @GetMapping("/getTenderById/{tenderId}")
+    public ResponseEntity<?> getTenderById(@PathVariable Long tenderId){
+        return new ResponseEntity<>(tenderService.findByTenderId(tenderId), HttpStatus.OK);
+    }
+
+    @GetMapping("/getBidById/{bidId}")
+    public ResponseEntity<?> getBidById(@PathVariable Long bidId){
+        return new ResponseEntity<>(statementService.findStatementById(bidId), HttpStatus.OK);
+    }
+
+
     @GetMapping("/allTenders")
     public ResponseEntity<?> allTenders(){
         return new ResponseEntity<>(tenderService.getAllTenders(), HttpStatus.OK);

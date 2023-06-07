@@ -63,12 +63,14 @@ public class TenderServiceImpl implements TenderService, StatementService {
 
     @Override
     public Statement findStatementById(Long id) {
-        return null;
+        return statementRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("statement not found"));
     }
 
     @Override
     public Tender findByTenderId(Long id) {
-        return null;
+        return tenderRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("tender not found"));
     }
 
     @Override
