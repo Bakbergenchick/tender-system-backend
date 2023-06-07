@@ -39,16 +39,16 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getAllUsers(){
+    public ResponseEntity<?> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO, final HttpServletRequest request){
+    public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO, final HttpServletRequest request) {
         Users new_user = userService.register(
                 registerDTO.getFirstname(),
                 registerDTO.getSurname(),
-                registerDTO.getSurname(),
+                registerDTO.getPatronymic(),
                 registerDTO.getEmail(),
                 registerDTO.getPassword());
         publisher.publishEvent(new RegistrationCompleteEvent(new_user, applicationUrl(request)));
@@ -56,15 +56,15 @@ public class UserController {
     }
 
     @GetMapping("/register/verifyEmail")
-    public String verifyEmail(@RequestParam("token") String token){
+    public String verifyEmail(@RequestParam("token") String token) {
         VerificationToken theToken = tokenRepository.findByToken(token);
 
-        if (theToken.getUsers().isActive()){
+        if (theToken.getUsers().isActive()) {
             return "This account has already been verified, please, login.";
         }
 
         String verificationResult = userService.validateToken(token);
-        if (verificationResult.equalsIgnoreCase("valid")){
+        if (verificationResult.equalsIgnoreCase("valid")) {
             return "Email verified successfully. Now you can login to your account";
         }
 
@@ -72,9 +72,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO){
+    public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         Users userByEmail = userService.findUserByEmail(loginDTO.getEmail());
-        if (!userByEmail.isActive()){
+        if (!userByEmail.isActive()) {
             return new ResponseEntity<>("You are not confirmed email!", HttpStatus.FORBIDDEN);
         }
         authenticate(loginDTO.getEmail(), loginDTO.getPassword());
@@ -95,6 +95,6 @@ public class UserController {
     }
 
     public String applicationUrl(HttpServletRequest request) {
-        return "http://"+request.getServerName()+":"+request.getServerPort()+request.getContextPath();
+        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
     }
 }
